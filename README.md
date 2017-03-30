@@ -1,47 +1,46 @@
-# DynamicBuffer, a wrapper around node.js Buffer class
+@fidian/DynamicBuffer
+=====================
 
-The Buffer class of node.js by default cannot be used as buffer to concatenate strings, like StringBuilder known from java [http://docs.oracle.com/javase/7/docs/api/java/lang/StringBuilder.html].
-This module contains a wrapper around node.js Buffer to concatenate strings into a Buffer, while automatically creating larger Buffers in the background, if more space is needed.
+> A wrapper around node.js `Buffer` class.
 
-    /**
-     * constructor, takes a starting size for the underlying buffer
-     * and a factor, in which the buffer grows, if it gets to small.
-     * Both have defaults (512 and 2.0).
-     */
-    var DynamicBuffer = module.exports = function(_size, _factor)
+This is a fork of Oliver Herdin's [DynamicBuffer](https://github.com/DDjarod/DynamicBuffer) module, altered to work with newer versions of Node. This one also includes some tests.
 
-    /**
-     * append a string to the buffer and return it for chaining
-     */
-    DynamicBuffer.prototype.append = function(_string)
+The `Buffer` class of node.js by default cannot be used as buffer to concatenate strings, like [`StringBuilder`](http://docs.oracle.com/javase/7/docs/api/java/lang/StringBuilder.html) does for Java. This module contains a wrapper around node.js `Buffer` to concatenate strings, bytes and `Buffer`s onto a `Buffer`. It automatically creates larger `Buffer` objects in the background when more space is needed.
 
-    /**
-     * append a byte to the buffer and return it for chaining
-     */
-    DynamicBuffer.prototype.write = function(_byte)
+    var buff, clonedDynamic, dynamic, DynamicBuffer;
 
-    /**
-     * append a javascript (V8) buffer or DynamicBuffer to this one
-     * and return it for chaining
-     */
-    DynamicBuffer.prototype.concat = function(_buffer)
+    DynamicBuffer = require("@fidian/dynamic-buffer");
 
-    /**
-     * get a copy of this DynamicBuffer. Changing one of the buffers does
-     * not change the other one. Will accept an optional size for the copy.
-     * If not given, the new one will be exactly the same as the original.
-     */
-    DynamicBuffer.prototype.clone = function(_newBufferSize, _newResizeFactor)
+    // Make a new dynamic buffer.
+    dynamic = new DynamicBuffer();
 
-    /**
-     * shrinks this buffer either to the given size, or the length of the current buffer.
-     * This method is mainly used to squeeze out the last bytes of memory, or increase the
-     * size for large chunks of data to come
-     */
-    DynamicBuffer.prototype.resizeUnderlyingBuffer = function(_size)
+    // Append a string with an optional encoding. You may also specify an
+    // optional length.
+    dynamic.append("a string");
+    dynamic.append("a string", "utf8");
+    dynamic.append("1234 <- just the numbers", 4);
+    dynamic.append("deadbeef", 2, "hex"); // Only DE AD
 
-    /**
-     * return a view of the underlying buffer that only contains the written space.
-     * Changing that view will change this buffer, too.
-     */
-    DynamicBuffer.prototype.getBuffer = function()
+    // Write an 8-bit byte.
+    dynamnic.write(127);
+
+    // Add another buffer or a DynamicBuffer
+    dynamic.concat(Buffer.from("abcd"));
+
+    // Get a copy of the DynamicBuffer. This allocates a new DynamicBuffer.
+    clonedDynamic = dynamic.clone();
+
+    // Shrink the DynamicBuffer to the minimum size needed for the current
+    // Buffer, or specify the size yourself.
+    dynamic.resizeUnderlyingBuffer();
+    dynamic.resizeUnderlyingBuffer(dynamic.length - 2); // Remove 2 bytes
+
+    // Returns a view of the underlying buffer. Changing the view will change
+    // the dynamic buffer as well.
+    buff = dynamic.getBuffer();
+
+
+Development
+-----------
+
+Make sure all changes have tests. Please follow our [contributor guide](CONTRIBUTING.md). This software falls under an [MIT License](LICENSE.md).
